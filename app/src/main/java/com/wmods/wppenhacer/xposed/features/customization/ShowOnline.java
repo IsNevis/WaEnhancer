@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -66,7 +64,7 @@ public class ShowOnline extends Feature {
                     TextView lastSeenText = new TextView(context);
                     lastSeenText.setId(0x7FFF0002);
                     lastSeenText.setTextSize(12f);
-                    lastSeenText.setText("");
+                    lastSeenText.setText(ResId.string.not_available);
                     lastSeenText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
                     lastSeenText.setGravity(Gravity.CENTER_VERTICAL);
                     lastSeenText.setVisibility(View.VISIBLE);
@@ -144,9 +142,6 @@ public class ShowOnline extends Feature {
                     csDot.setVisibility(View.INVISIBLE);
                 }
                 TextView lastSeenText = showOnlineText ? view.findViewById(0x7FFF0002) : null;
-                if (showOnlineText) {
-                    lastSeenText.setVisibility(View.INVISIBLE); // Hide last seen time initially
-                }
                 var jidFiled = ReflectionUtils.getFieldByExtendType(object.getClass(), XposedHelpers.findClass("com.whatsapp.jid.Jid", classLoader));
                 var jidObject = jidFiled.get(object);
                 var jid = WppCore.getRawString(jidObject);
