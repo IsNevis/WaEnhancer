@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -142,6 +144,9 @@ public class ShowOnline extends Feature {
                     csDot.setVisibility(View.INVISIBLE);
                 }
                 TextView lastSeenText = showOnlineText ? view.findViewById(0x7FFF0002) : null;
+                if (showOnlineText) {
+                    lastSeenText.setVisibility(View.INVISIBLE); // Hide last seen time initially
+                }
                 var jidFiled = ReflectionUtils.getFieldByExtendType(object.getClass(), XposedHelpers.findClass("com.whatsapp.jid.Jid", classLoader));
                 var jidObject = jidFiled.get(object);
                 var jid = WppCore.getRawString(jidObject);
@@ -168,7 +173,7 @@ public class ShowOnline extends Feature {
                             lastSeenText.setTextColor(0xffcac100);
                         }
                     } else {
-                        lastSeenText.setText("");
+                        lastSeenText.setText(ResId.string.not_available);
                         lastSeenText.setTextColor(Color.GRAY);
                     }
                 }
