@@ -1,4 +1,4 @@
-# WaEnhancer
+# WaEnhancer Fork
 <div align="center">
   WaEnhancer is an Xposed module that enhances your WhatsApp experience.<br><br>
   Please note that this project is currently in development, so bugs and crashes may occur. If you encounter any issues report them in our group or create an [issues](https://github.com/Dev4Mod/WaEnhancer/issues) here.
