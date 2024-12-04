@@ -2,6 +2,7 @@ package com.wmods.wppenhacer.xposed.features.privacy;
 
 import android.os.Message;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -10,6 +11,7 @@ import com.wmods.wppenhacer.xposed.core.WppCore;
 import com.wmods.wppenhacer.xposed.core.devkit.Unobfuscator;
 import com.wmods.wppenhacer.xposed.features.general.Tasker;
 import com.wmods.wppenhacer.xposed.utils.ReflectionUtils;
+import com.wmods.wppenhacer.xposed.utils.Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -34,8 +36,16 @@ public class CallPrivacy extends Feature {
         XposedBridge.hookMethod(onCallReceivedMethod, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object callinfo = ((Message) param.args[0]).obj;
+                Object callinfo = null;
                 Class<?> callInfoClass = XposedHelpers.findClass("com.whatsapp.voipcalling.CallInfo", classLoader);
+                if (param.args[0] instanceof Message) {
+                    callinfo = ((Message) param.args[0]).obj;
+                } else if (param.args.length > 1 && callInfoClass.isInstance(param.args[1])) {
+                    callinfo = param.args[1];
+                } else {
+                    Utils.showToast("Invalid call info", Toast.LENGTH_SHORT);
+                    return;
+                }
                 if (callinfo == null || !callInfoClass.isInstance(callinfo)) return;
                 if ((boolean) XposedHelpers.callMethod(callinfo, "isCaller")) return;
                 var userJid = XposedHelpers.callMethod(callinfo, "getPeerJid");
@@ -50,15 +60,10 @@ public class CallPrivacy extends Feature {
                     case "uncallable":
                     case "declined":
                         var rejectCallMethod = ReflectionUtils.findMethodUsingFilter(clazzVoip, m -> m.getName().equals("rejectCall"));
-                        var obj = new Object[rejectCallMethod.getParameterCount()];
-                        obj[0] = callId;
-                        obj[1] = "declined".equals(rejectType) ? null : rejectType;
-                        if (obj.length > 2) {
-                            obj[2] = 0;
-                        }
-
-                        ReflectionUtils.callMethod(rejectCallMethod, null, obj);
-                        param.setResult(true);
+                        var params = ReflectionUtils.initArray(rejectCallMethod.getParameterTypes());
+                        params[0] = callId;
+                        params[1] = "declined".equals(rejectType) ? null : rejectType;
+                        ReflectionUtils.callMethod(rejectCallMethod, null, params);
                         break;
                     case "ended":
                         try {
@@ -66,7 +71,6 @@ public class CallPrivacy extends Feature {
                         } catch (NoSuchMethodError e) {
                             XposedHelpers.callStaticMethod(clazzVoip, "endCall", true, 0);
                         }
-                        param.setResult(true);
                         break;
                     default:
                 }

@@ -152,7 +152,7 @@ public class ReflectionUtils {
         }
     }
 
-    private static Object[] initArray(Class<?>[] parameterTypes) {
+    public static Object[] initArray(Class<?>[] parameterTypes) {
         var args = new Object[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             args[i] = getDefaultValue(parameterTypes[i]);
@@ -173,7 +173,7 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static Object getField(Field loadProfileInfoField, Object thisObject) {
+    public static Object getObjectField(Field loadProfileInfoField, Object thisObject) {
         try {
             return loadProfileInfoField.get(thisObject);
         } catch (Exception e) {
